@@ -139,6 +139,7 @@ export default function WorkoutLogger({ onSessionSaved }) {
               <input
                 className="set-input"
                 type="number"
+                inputMode="decimal"
                 placeholder="0"
                 value={set.weight}
                 onChange={e => handleSetChange(ex.id, i, "weight", e.target.value)}
@@ -146,6 +147,7 @@ export default function WorkoutLogger({ onSessionSaved }) {
               <input
                 className="set-input"
                 type="number"
+                inputMode="numeric"
                 placeholder={ex.reps}
                 value={set.reps}
                 onChange={e => handleSetChange(ex.id, i, "reps", e.target.value)}

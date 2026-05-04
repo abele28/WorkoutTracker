@@ -78,18 +78,17 @@ export default function Progress({ theme = "dark" }) {
         <div className="log-weight-row">
           <input
             type="number"
+            inputMode="decimal"
             className="set-input"
             placeholder="Weight (lbs)"
             value={weightInput}
             onChange={e => setWeightInput(e.target.value)}
-            style={{ width: "130px" }}
           />
           <input
             type="date"
             className="set-input"
             value={dateInput}
             onChange={e => setDateInput(e.target.value)}
-            style={{ width: "150px" }}
           />
           <button className="btn-primary" onClick={handleLogWeight}>
             {saved ? "Saved ✓" : "Log Weight"}

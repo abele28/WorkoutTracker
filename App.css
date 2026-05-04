@@ -38,12 +38,18 @@
 html, body { height: 100%; }
 
 body {
-  background:   var(--bg);
-  color:         var(--text);
-  font-family:   'Barlow', sans-serif;
-  font-size:     16px;
-  line-height:   1.5;
-  -webkit-font-smoothing: antialiased;
+  background:                 var(--bg);
+  color:                      var(--text);
+  font-family:                'Barlow', sans-serif;
+  font-size:                  16px;
+  line-height:                1.5;
+  -webkit-font-smoothing:     antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y:      none;
+}
+
+button {
+  touch-action: manipulation;
 }
 
 /* ── App Shell ────────────────────────────────────────────── */
@@ -51,25 +57,26 @@ body {
   display:         flex;
   flex-direction:  column;
   min-height:      100vh;
+  min-height:      100dvh;
   max-width:       480px;
   margin:          0 auto;
 }
 
 /* ── Header ───────────────────────────────────────────────── */
 .app-header {
-  position:   sticky;
-  top:        0;
-  z-index:    10;
-  background: var(--bg);
+  position:      sticky;
+  top:           0;
+  z-index:       10;
+  background:    var(--bg);
   border-bottom: 1px solid var(--border);
-  height:     var(--header-h);
+  padding-top:   env(safe-area-inset-top);
 }
 .header-inner {
-  display:         flex;
-  align-items:     center;
-  gap:             10px;
-  padding:         0 20px;
-  height:          100%;
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  padding:     0 20px;
+  height:      var(--header-h);
 }
 .theme-toggle {
   margin-left:   auto;
@@ -99,24 +106,24 @@ body {
 
 /* ── Main ─────────────────────────────────────────────────── */
 .app-main {
-  flex:       1;
-  overflow-y: auto;
-  padding-bottom: calc(var(--nav-h) + 16px);
+  flex:           1;
+  overflow-y:     auto;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
 }
 
 /* ── Bottom Nav ───────────────────────────────────────────── */
 .bottom-nav {
-  position:   fixed;
-  bottom:     0;
-  left:       50%;
-  transform:  translateX(-50%);
-  width:      100%;
-  max-width:  480px;
-  height:     var(--nav-h);
-  background: var(--bg-2);
-  border-top: 1px solid var(--border);
-  display:    flex;
-  z-index:    20;
+  position:       fixed;
+  bottom:         0;
+  left:           50%;
+  transform:      translateX(-50%);
+  width:          100%;
+  max-width:      480px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background:     var(--bg-2);
+  border-top:     1px solid var(--border);
+  display:        flex;
+  z-index:        20;
 }
 .nav-tab {
   flex:            1;
@@ -272,7 +279,7 @@ body {
   border:        1px solid var(--border);
   border-radius: 6px;
   color:         var(--text);
-  font-size:     15px;
+  font-size:     16px;
   padding:       6px 10px;
   width:         100%;
   text-align:    center;
@@ -297,7 +304,7 @@ body {
   border-radius: var(--radius);
   color:         var(--text);
   font-family:   'Barlow', sans-serif;
-  font-size:     14px;
+  font-size:     16px;
   padding:       10px 12px;
   resize:        vertical;
 }
@@ -445,11 +452,13 @@ body {
   font-size:   14px;
 }
 .log-weight-row {
-  display:       flex;
-  gap:           8px;
-  align-items:   center;
-  margin-bottom: 16px;
-  flex-wrap:     wrap;
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   8px;
+  margin-bottom:         16px;
+}
+.log-weight-row .btn-primary {
+  grid-column: 1 / -1;
 }
 .stats-grid {
   display:               grid;
