@@ -10,7 +10,7 @@
 // Instead, we use state to swap out which component is shown.
 // ============================================================
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import WorkoutLogger  from "./components/WorkoutLogger";
 import WorkoutHistory from "./components/WorkoutHistory";
 import Progress       from "./components/Progress";
@@ -27,6 +27,12 @@ export default function App() {
   const [activeTab, setActiveTab]     = useState("log");
   // refreshKey lets us tell History to re-render when a new session is saved
   const [refreshKey, setRefreshKey]   = useState(0);
+  const [theme, setTheme]             = useState(() => localStorage.getItem("theme") || "dark");
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   function handleSessionSaved() {
     setRefreshKey(k => k + 1);
@@ -40,6 +46,13 @@ export default function App() {
         <div className="header-inner">
           <span className="header-logo">LIFT</span>
           <span className="header-sub">Block 1 · Week 1</span>
+          <button
+            className="theme-toggle"
+            onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? "☀" : "🌙"}
+          </button>
         </div>
       </header>
 
@@ -52,7 +65,7 @@ export default function App() {
           <WorkoutHistory refreshKey={refreshKey} />
         )}
         {activeTab === "progress" && (
-          <Progress />
+          <Progress theme={theme} />
         )}
       </main>
 
