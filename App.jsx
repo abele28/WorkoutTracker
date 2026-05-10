@@ -1,22 +1,11 @@
-// ============================================================
-// APP.JSX — The Root Component
-//
-// Every React app has one "root" component that holds everything.
-// This one manages:
-//   - Which page ("tab") is currently visible
-//   - The navigation bar at the bottom
-//
-// Notice: we never use <a href="..."> for navigation in React.
-// Instead, we use state to swap out which component is shown.
-// ============================================================
-
 import { useState, useEffect } from "react";
 import WorkoutLogger  from "./components/WorkoutLogger";
 import WorkoutHistory from "./components/WorkoutHistory";
 import Progress       from "./components/Progress";
+import { PROGRAM } from "./data/workoutTemplates";
+import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek } from "./utils/storage";
 import "./App.css";
 
-// These are the pages of our app
 const TABS = [
   { id: "log",      label: "Log",     icon: "＋" },
   { id: "history",  label: "History", icon: "≡" },
@@ -24,19 +13,44 @@ const TABS = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab]     = useState("log");
-  // refreshKey lets us tell History to re-render when a new session is saved
-  const [refreshKey, setRefreshKey]   = useState(0);
-  const [theme, setTheme]             = useState(() => localStorage.getItem("theme") || "dark");
+  const [activeTab, setActiveTab]       = useState("log");
+  const [refreshKey, setRefreshKey]     = useState(0);
+  const [theme, setTheme]               = useState(() => localStorage.getItem("theme") || "dark");
+  const [weekIdx, setWeekIdx]           = useState(() => {
+    const saved = getCurrentWeekIndex();
+    return Math.min(saved, PROGRAM.length - 1);
+  });
+  const [weekComplete, setWeekComplete] = useState(false);
+
+  const currentWeek = PROGRAM[weekIdx];
+  const isLastWeek  = weekIdx >= PROGRAM.length - 1;
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  function handleSessionSaved() {
+  function handleSessionSaved(savedWeekNum) {
     setRefreshKey(k => k + 1);
-    setActiveTab("history"); // jump to history after logging
+    setActiveTab("history");
+
+    // Check if all workouts for this week are now done
+    const sessions      = getSessionsForWeek(savedWeekNum);
+    const completedTypes = new Set(sessions.map(s => s.workoutType));
+    const required       = currentWeek.workoutOrder;
+    if (required.every(r => completedTypes.has(r))) {
+      setWeekComplete(true);
+    }
+  }
+
+  function handleAdvanceWeek() {
+    if (!isLastWeek) {
+      const next = weekIdx + 1;
+      setWeekIdx(next);
+      setCurrentWeekIndex(next);
+    }
+    setWeekComplete(false);
+    setActiveTab("log");
   }
 
   return (
@@ -45,7 +59,7 @@ export default function App() {
       <header className="app-header">
         <div className="header-inner">
           <span className="header-logo">LIFT</span>
-          <span className="header-sub">Block 1 · Week 1</span>
+          <span className="header-sub">{currentWeek.label}</span>
           <button
             className="theme-toggle"
             onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
@@ -56,10 +70,35 @@ export default function App() {
         </div>
       </header>
 
+      {/* ── Week Complete Banner ── */}
+      {weekComplete && (
+        <div className="week-complete-banner">
+          <div className="week-complete-content">
+            <div className="week-complete-icon">🎉</div>
+            <div>
+              <strong>{currentWeek.label} complete!</strong>
+              {!isLastWeek && (
+                <p>{PROGRAM[weekIdx + 1].label} is now unlocked.</p>
+              )}
+              {isLastWeek && <p>You've finished the summer program!</p>}
+            </div>
+            <button
+              className="btn-primary"
+              onClick={handleAdvanceWeek}
+            >
+              {isLastWeek ? "Done!" : `Start ${PROGRAM[weekIdx + 1].label} →`}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Main Content ── */}
       <main className="app-main">
         {activeTab === "log" && (
-          <WorkoutLogger onSessionSaved={handleSessionSaved} />
+          <WorkoutLogger
+            currentWeek={currentWeek}
+            onSessionSaved={handleSessionSaved}
+          />
         )}
         {activeTab === "history" && (
           <WorkoutHistory refreshKey={refreshKey} />

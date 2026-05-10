@@ -1,33 +1,20 @@
-// ============================================================
-// WORKOUT LOGGER COMPONENT
-//
-// A "component" in React is just a function that returns UI.
-// This one handles logging a single workout session:
-//   1. You pick which day (Upper A, Upper B, etc.)
-//   2. For each exercise, you fill in weight and reps per set
-//   3. You hit "Finish" and it saves to localStorage
-// ============================================================
-
 import { useState } from "react";
-import { WORKOUT_TEMPLATES, WORKOUT_ORDER } from "../data/workoutTemplates";
 import { saveSession, generateId } from "../utils/storage";
 
-export default function WorkoutLogger({ onSessionSaved }) {
-  // useState lets us track values that change over time.
-  // When state changes, React re-renders the component automatically.
+export default function WorkoutLogger({ currentWeek, onSessionSaved }) {
   const [selectedDay, setSelectedDay] = useState(null);
-  const [setData, setSetData]         = useState({});   // { exerciseId: [{ weight, reps }, ...] }
+  const [setData, setSetData]         = useState({});
   const [notes, setNotes]             = useState("");
   const [saved, setSaved]             = useState(false);
 
-  // Called when user picks a workout day
+  const { workouts, workoutOrder, weekNum, label } = currentWeek;
+
   function handleSelectDay(dayName) {
     setSelectedDay(dayName);
     setSetData({});
     setNotes("");
     setSaved(false);
-    // Pre-populate empty set entries based on the template
-    const template = WORKOUT_TEMPLATES[dayName];
+    const template = workouts[dayName];
     const initial = {};
     template.exercises.forEach(ex => {
       initial[ex.id] = Array.from({ length: ex.sets }, () => ({ weight: "", reps: "" }));
@@ -35,7 +22,6 @@ export default function WorkoutLogger({ onSessionSaved }) {
     setSetData(initial);
   }
 
-  // Update a single set's weight or reps
   function handleSetChange(exId, setIndex, field, value) {
     setSetData(prev => {
       const updated = { ...prev };
@@ -46,13 +32,14 @@ export default function WorkoutLogger({ onSessionSaved }) {
     });
   }
 
-  // Save the finished session
   function handleFinish() {
     const session = {
       id:          generateId(),
       date:        new Date().toISOString(),
+      weekNum,
+      weekLabel:   label,
       workoutType: selectedDay,
-      exercises:   WORKOUT_TEMPLATES[selectedDay].exercises.map(ex => ({
+      exercises:   workouts[selectedDay].exercises.map(ex => ({
         id:    ex.id,
         name:  ex.name,
         sets:  setData[ex.id] || [],
@@ -61,18 +48,18 @@ export default function WorkoutLogger({ onSessionSaved }) {
     };
     saveSession(session);
     setSaved(true);
-    onSessionSaved?.(); // tell parent a new session was saved
+    onSessionSaved?.(weekNum);
   }
 
-  // ---- RENDER: Day Selector ----
+  // ---- Day Selector ----
   if (!selectedDay) {
     return (
       <div className="logger-container">
         <h2 className="section-title">Log Today's Workout</h2>
-        <p className="section-sub">Pick your session for today:</p>
+        <p className="section-sub">{label} — pick your session:</p>
         <div className="day-grid">
-          {WORKOUT_ORDER.map(day => {
-            const t = WORKOUT_TEMPLATES[day];
+          {workoutOrder.map(day => {
+            const t = workouts[day];
             return (
               <button
                 key={day}
@@ -91,9 +78,9 @@ export default function WorkoutLogger({ onSessionSaved }) {
     );
   }
 
-  const template = WORKOUT_TEMPLATES[selectedDay];
+  const template = workouts[selectedDay];
 
-  // ---- RENDER: Saved confirmation ----
+  // ---- Saved confirmation ----
   if (saved) {
     return (
       <div className="logger-container">
@@ -111,7 +98,7 @@ export default function WorkoutLogger({ onSessionSaved }) {
     );
   }
 
-  // ---- RENDER: Logging form ----
+  // ---- Logging form ----
   return (
     <div className="logger-container">
       <div className="logger-header" style={{ "--accent": template.color }}>

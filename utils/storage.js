@@ -38,6 +38,20 @@ export function deleteSession(sessionId) {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
+// --- WEEK TRACKING ---
+
+export function getCurrentWeekIndex() {
+  return parseInt(localStorage.getItem("wt_current_week") || "0", 10);
+}
+
+export function setCurrentWeekIndex(n) {
+  localStorage.setItem("wt_current_week", String(n));
+}
+
+export function getSessionsForWeek(weekNum) {
+  return getSessions().filter(s => s.weekNum === weekNum);
+}
+
 // --- BODY METRICS ---
 
 export function getMetrics() {
