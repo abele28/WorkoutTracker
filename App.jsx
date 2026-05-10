@@ -21,6 +21,7 @@ export default function App() {
     return Math.min(saved, PROGRAM.length - 1);
   });
   const [weekComplete, setWeekComplete] = useState(false);
+  const [showWeekPicker, setShowWeekPicker] = useState(false);
 
   const currentWeek = PROGRAM[weekIdx];
   const isLastWeek  = weekIdx >= PROGRAM.length - 1;
@@ -33,9 +34,7 @@ export default function App() {
   function handleSessionSaved(savedWeekNum) {
     setRefreshKey(k => k + 1);
     setActiveTab("history");
-
-    // Check if all workouts for this week are now done
-    const sessions      = getSessionsForWeek(savedWeekNum);
+    const sessions       = getSessionsForWeek(savedWeekNum);
     const completedTypes = new Set(sessions.map(s => s.workoutType));
     const required       = currentWeek.workoutOrder;
     if (required.every(r => completedTypes.has(r))) {
@@ -53,13 +52,27 @@ export default function App() {
     setActiveTab("log");
   }
 
+  function handlePickWeek(idx) {
+    setWeekIdx(idx);
+    setCurrentWeekIndex(idx);
+    setWeekComplete(false);
+    setShowWeekPicker(false);
+    setActiveTab("log");
+  }
+
   return (
     <div className="app">
       {/* ── Header ── */}
       <header className="app-header">
         <div className="header-inner">
           <span className="header-logo">LIFT</span>
-          <span className="header-sub">{currentWeek.label}</span>
+          <button
+            className="week-label-btn"
+            onClick={() => setShowWeekPicker(v => !v)}
+            title="Change week"
+          >
+            {currentWeek.label} ▾
+          </button>
           <button
             className="theme-toggle"
             onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
@@ -70,6 +83,31 @@ export default function App() {
         </div>
       </header>
 
+      {/* ── Week Picker ── */}
+      {showWeekPicker && (
+        <div className="week-picker-overlay" onClick={() => setShowWeekPicker(false)}>
+          <div className="week-picker" onClick={e => e.stopPropagation()}>
+            <div className="week-picker-header">
+              <span>Jump to week</span>
+              <button className="week-picker-close" onClick={() => setShowWeekPicker(false)}>✕</button>
+            </div>
+            <div className="week-picker-list">
+              {PROGRAM.map((week, idx) => (
+                <button
+                  key={week.weekNum}
+                  className={`week-picker-item ${idx === weekIdx ? "week-picker-item--active" : ""} week-picker-item--${week.type}`}
+                  onClick={() => handlePickWeek(idx)}
+                >
+                  <span className="wpi-label">{week.label}</span>
+                  <span className="wpi-block">{week.block}</span>
+                  {idx === weekIdx && <span className="wpi-current">current</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Week Complete Banner ── */}
       {weekComplete && (
         <div className="week-complete-banner">
@@ -77,15 +115,10 @@ export default function App() {
             <div className="week-complete-icon">🎉</div>
             <div>
               <strong>{currentWeek.label} complete!</strong>
-              {!isLastWeek && (
-                <p>{PROGRAM[weekIdx + 1].label} is now unlocked.</p>
-              )}
-              {isLastWeek && <p>You've finished the summer program!</p>}
+              {!isLastWeek && <p>{PROGRAM[weekIdx + 1].label} is now unlocked.</p>}
+              {isLastWeek  && <p>You've finished the summer program!</p>}
             </div>
-            <button
-              className="btn-primary"
-              onClick={handleAdvanceWeek}
-            >
+            <button className="btn-primary" onClick={handleAdvanceWeek}>
               {isLastWeek ? "Done!" : `Start ${PROGRAM[weekIdx + 1].label} →`}
             </button>
           </div>
@@ -95,17 +128,10 @@ export default function App() {
       {/* ── Main Content ── */}
       <main className="app-main">
         {activeTab === "log" && (
-          <WorkoutLogger
-            currentWeek={currentWeek}
-            onSessionSaved={handleSessionSaved}
-          />
+          <WorkoutLogger currentWeek={currentWeek} onSessionSaved={handleSessionSaved} />
         )}
-        {activeTab === "history" && (
-          <WorkoutHistory refreshKey={refreshKey} />
-        )}
-        {activeTab === "progress" && (
-          <Progress theme={theme} />
-        )}
+        {activeTab === "history" && <WorkoutHistory refreshKey={refreshKey} />}
+        {activeTab === "progress" && <Progress theme={theme} />}
       </main>
 
       {/* ── Bottom Navigation ── */}

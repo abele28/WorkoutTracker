@@ -518,3 +518,108 @@ button {
   flex-shrink:  0;
   white-space:  nowrap;
 }
+
+/* ── Week label button in header ─────────────────────────── */
+.week-label-btn {
+  background:   none;
+  border:       none;
+  color:        var(--text-muted);
+  font-family:  'Barlow Condensed', sans-serif;
+  font-size:    14px;
+  font-weight:  600;
+  letter-spacing: 0.3px;
+  cursor:       pointer;
+  padding:      2px 4px;
+  border-radius: 4px;
+  transition:   background 0.15s;
+  flex:         1;
+  text-align:   center;
+}
+.week-label-btn:hover { background: rgba(255,255,255,0.06); }
+
+/* ── Week picker overlay ─────────────────────────────────── */
+.week-picker-overlay {
+  position:   fixed;
+  inset:      0;
+  background: rgba(0,0,0,0.6);
+  z-index:    200;
+  display:    flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: calc(var(--header-h) + 8px);
+}
+.week-picker {
+  background:    var(--bg-2);
+  border:        1px solid var(--border);
+  border-radius: 12px;
+  width:         min(92vw, 360px);
+  max-height:    72vh;
+  display:       flex;
+  flex-direction: column;
+  overflow:      hidden;
+}
+.week-picker-header {
+  display:      flex;
+  align-items:  center;
+  justify-content: space-between;
+  padding:      14px 16px 12px;
+  font-weight:  700;
+  font-size:    15px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:  0;
+}
+.week-picker-close {
+  background: none;
+  border:     none;
+  color:      var(--text-muted);
+  font-size:  18px;
+  cursor:     pointer;
+  line-height: 1;
+  padding:    0 2px;
+}
+.week-picker-list {
+  overflow-y: auto;
+  padding:    8px;
+  display:    flex;
+  flex-direction: column;
+  gap:        4px;
+}
+.week-picker-item {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       11px 12px;
+  border-radius: 8px;
+  border:        1px solid transparent;
+  background:    transparent;
+  cursor:        pointer;
+  text-align:    left;
+  transition:    background 0.12s;
+  width:         100%;
+}
+.week-picker-item:hover { background: var(--bg-3); }
+.week-picker-item--active {
+  background:   rgba(232,93,38,0.08) !important;
+  border-color: var(--orange);
+}
+.week-picker-item--deload  { opacity: 0.75; }
+.week-picker-item--taper   { opacity: 0.75; }
+.wpi-label {
+  font-weight: 600;
+  font-size:   14px;
+  color:       var(--text);
+  flex:        1;
+}
+.wpi-block {
+  font-size:  12px;
+  color:      var(--text-muted);
+  flex-shrink: 0;
+}
+.wpi-current {
+  font-size:    10px;
+  font-weight:  700;
+  color:        var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink:  0;
+}
