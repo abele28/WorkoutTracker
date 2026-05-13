@@ -7,9 +7,9 @@ import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek } from "./
 import "./App.css";
 
 const TABS = [
-  { id: "log",      label: "Log",     icon: "＋" },
-  { id: "history",  label: "History", icon: "≡" },
-  { id: "progress", label: "Progress",icon: "↑" },
+  { id: "log",      label: "Log",      icon: "+" },
+  { id: "history",  label: "History",  icon: "≡" },
+  { id: "progress", label: "Analytics",icon: "△" },
 ];
 
 export default function App() {
@@ -65,7 +65,7 @@ export default function App() {
       {/* ── Header ── */}
       <header className="app-header">
         <div className="header-inner">
-          <span className="header-logo">LIFT</span>
+          <span className="header-logo">LIFT.EXE</span>
           <button
             className="week-label-btn"
             onClick={() => setShowWeekPicker(v => !v)}
@@ -112,14 +112,14 @@ export default function App() {
       {weekComplete && (
         <div className="week-complete-banner">
           <div className="week-complete-content">
-            <div className="week-complete-icon">🎉</div>
+            <div className="week-complete-icon">[✓]</div>
             <div>
               <strong>{currentWeek.label} complete!</strong>
-              {!isLastWeek && <p>{PROGRAM[weekIdx + 1].label} is now unlocked.</p>}
-              {isLastWeek  && <p>You've finished the summer program!</p>}
+              {!isLastWeek && <p>{PROGRAM[weekIdx + 1].label} unlocked.</p>}
+              {isLastWeek  && <p>PROGRAM_COMPLETE — all 16 weeks done.</p>}
             </div>
             <button className="btn-primary" onClick={handleAdvanceWeek}>
-              {isLastWeek ? "Done!" : `Start ${PROGRAM[weekIdx + 1].label} →`}
+              {isLastWeek ? "DONE" : `NEXT →`}
             </button>
           </div>
         </div>

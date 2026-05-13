@@ -24,10 +24,10 @@ export default function WorkoutHistory({ refreshKey }) {
   if (sessions.length === 0) {
     return (
       <div className="history-container">
-        <h2 className="section-title">Workout History</h2>
+        <h2 className="section-title">&gt;_ SESSION_LOG</h2>
         <div className="empty-state">
           <p>No sessions logged yet.</p>
-          <p>Head to Log Workout to get started.</p>
+          <p>Head to Log to initialize records.</p>
         </div>
       </div>
     );
@@ -35,8 +35,8 @@ export default function WorkoutHistory({ refreshKey }) {
 
   return (
     <div className="history-container">
-      <h2 className="section-title">Workout History</h2>
-      <p className="section-sub">{sessions.length} session{sessions.length !== 1 ? "s" : ""} logged</p>
+      <h2 className="section-title">&gt;_ SESSION_LOG</h2>
+      <p className="section-sub">// {sessions.length} record{sessions.length !== 1 ? "s" : ""} on file</p>
 
       {sessions.map(session => {
         const template = WORKOUT_TEMPLATES[session.workoutType];
