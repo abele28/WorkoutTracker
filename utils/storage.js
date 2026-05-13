@@ -95,3 +95,32 @@ export function formatDateShort(isoString) {
     month: "short", day: "numeric",
   });
 }
+
+// --- MAIN LIFT 1RM TRACKING (BB Back Squat, BB Bench, TBDL) ---
+
+const MAIN_LIFTS_KEY = "wt_main_lifts";
+
+export function getMainLiftSets() {
+  try {
+    return JSON.parse(localStorage.getItem(MAIN_LIFTS_KEY) || "{}");
+  } catch { return {}; }
+}
+
+export function saveMainLiftSet(lift, weight, reps) {
+  const data = getMainLiftSets();
+  if (!data[lift]) data[lift] = [];
+  data[lift].push({
+    id: generateId(),
+    date: new Date().toISOString().slice(0, 10),
+    weight: +weight,
+    reps: +reps,
+  });
+  data[lift].sort((a, b) => a.date.localeCompare(b.date));
+  localStorage.setItem(MAIN_LIFTS_KEY, JSON.stringify(data));
+}
+
+export function deleteMainLiftSet(lift, id) {
+  const data = getMainLiftSets();
+  if (data[lift]) data[lift] = data[lift].filter(s => s.id !== id);
+  localStorage.setItem(MAIN_LIFTS_KEY, JSON.stringify(data));
+}
