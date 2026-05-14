@@ -35,7 +35,7 @@ export default function App() {
 
   function handleSessionSaved(savedWeekNum) {
     setRefreshKey(k => k + 1);
-    setActiveTab("history");
+    setActiveTab("log");
     const sessions       = getSessionsForWeek(savedWeekNum);
     const completedTypes = new Set(sessions.map(s => s.workoutType));
     const required       = currentWeek.workoutOrder;
