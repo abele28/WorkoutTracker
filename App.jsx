@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import WorkoutLogger  from "./components/WorkoutLogger";
 import WorkoutHistory from "./components/WorkoutHistory";
 import Progress       from "./components/Progress";
+import Nutrition      from "./components/Nutrition";
 import { PROGRAM } from "./data/workoutTemplates";
 import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek } from "./utils/storage";
 import "./App.css";
 
 const TABS = [
-  { id: "log",      label: "Log",      icon: "+" },
-  { id: "history",  label: "History",  icon: "≡" },
-  { id: "progress", label: "Analytics",icon: "△" },
+  { id: "log",       label: "Train",    icon: "⚡" },
+  { id: "nutrition", label: "Nutrition",icon: "◈" },
+  { id: "history",   label: "History",  icon: "≡" },
+  { id: "progress",  label: "Analytics",icon: "△" },
 ];
 
 export default function App() {
@@ -65,7 +67,7 @@ export default function App() {
       {/* ── Header ── */}
       <header className="app-header">
         <div className="header-inner">
-          <span className="header-logo">LIFT.EXE</span>
+          <span className="header-logo">RECOMP.EXE</span>
           <button
             className="week-label-btn"
             onClick={() => setShowWeekPicker(v => !v)}
@@ -127,11 +129,10 @@ export default function App() {
 
       {/* ── Main Content ── */}
       <main className="app-main">
-        {activeTab === "log" && (
-          <WorkoutLogger currentWeek={currentWeek} onSessionSaved={handleSessionSaved} />
-        )}
-        {activeTab === "history" && <WorkoutHistory refreshKey={refreshKey} />}
-        {activeTab === "progress" && <Progress theme={theme} />}
+        {activeTab === "log"       && <WorkoutLogger currentWeek={currentWeek} onSessionSaved={handleSessionSaved} />}
+        {activeTab === "nutrition" && <Nutrition theme={theme} />}
+        {activeTab === "history"   && <WorkoutHistory refreshKey={refreshKey} />}
+        {activeTab === "progress"  && <Progress theme={theme} />}
       </main>
 
       {/* ── Bottom Navigation ── */}

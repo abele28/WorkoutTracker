@@ -95,36 +95,39 @@ function ExerciseView({ exercise, setIndex, totalSets, totalExercises, allExerci
 
   return (
     <div className="ex-view">
-      {/* ── Progress Nav ── */}
-      <div className="ex-nav">
-        <button className="ex-nav-btn" onClick={onPrev} disabled={isFirst}>‹</button>
-        <div className="ex-nav-center">
-          <span className="ex-counter">{setIndex + 1} / {totalExercises}</span>
-          <div className="ex-dots">
-            {allExercises.map((ex, i) => {
-              const done = (setData[ex.id] || []).some(s => s.weight || s.reps);
-              return (
-                <span key={i} className={
-                  `ex-dot ${i === setIndex ? 'ex-dot--active' : done ? 'ex-dot--done' : ''}`
-                } />
-              );
-            })}
+      {/* ── Sticky combined header: nav + exercise info + diagram ── */}
+      <div className="ex-sticky-header" style={{ borderLeftColor: template.color }}>
+        {/* Navigation row */}
+        <div className="ex-nav">
+          <button className="ex-nav-btn" onClick={onPrev} disabled={isFirst}>‹</button>
+          <div className="ex-nav-center">
+            <span className="ex-counter">{setIndex + 1} / {totalExercises}</span>
+            <div className="ex-dots">
+              {allExercises.map((ex, i) => {
+                const done = (setData[ex.id] || []).some(s => s.weight || s.reps);
+                return (
+                  <span key={i} className={
+                    `ex-dot ${i === setIndex ? 'ex-dot--active' : done ? 'ex-dot--done' : ''}`
+                  } />
+                );
+              })}
+            </div>
           </div>
+          <button className="ex-nav-btn" onClick={onNext} disabled={isLast}>›</button>
         </div>
-        <button className="ex-nav-btn" onClick={onNext} disabled={isLast}>›</button>
-      </div>
 
-      {/* ── Exercise Header: name + muscle diagram ── */}
-      <div className="ex-header" style={{ borderLeftColor: template.color }}>
-        <div className="ex-meta">
-          <h2 className="ex-name">{exercise.name}</h2>
-          <div className="ex-prescription">
-            <span className="ex-vol">{exercise.sets} × {exercise.reps}</span>
-            {exercise.note && <span className="ex-note-chip">{exercise.note}</span>}
+        {/* Exercise name + diagram — always fully visible, never scrolled under anything */}
+        <div className="ex-header">
+          <div className="ex-meta">
+            <h2 className="ex-name">{exercise.name}</h2>
+            <div className="ex-prescription">
+              <span className="ex-vol">{exercise.sets} × {exercise.reps}</span>
+              {exercise.note && <span className="ex-note-chip">{exercise.note}</span>}
+            </div>
           </div>
-        </div>
-        <div className="ex-diagram-wrap">
-          <MuscleDiagram exerciseName={exercise.name} />
+          <div className="ex-diagram-wrap">
+            <MuscleDiagram exerciseName={exercise.name} />
+          </div>
         </div>
       </div>
 
