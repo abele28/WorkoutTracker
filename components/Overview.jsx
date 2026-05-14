@@ -48,7 +48,7 @@ function WeightPredictor({ logs }) {
   const lbsPerWeek = lbsPerDay * 7;
   const direction  = lbsPerDay < -0.01 ? "↓" : lbsPerDay > 0.01 ? "↑" : "→";
 
-  const targets = [30, 90, 180].map(daysAhead => {
+  const targets = [7, 30, 90].map(daysAhead => {
     const futureX    = lastIdx + daysAhead;
     const predicted  = reg.slope * futureX + reg.intercept;
     const confidence = reg.rmse * Math.sqrt(1 + 1 / weightPoints.length + daysAhead / weightPoints.length);
