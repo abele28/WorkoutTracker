@@ -67,7 +67,10 @@ export default function App() {
       {/* ── Header ── */}
       <header className="app-header">
         <div className="header-inner">
-          <span className="header-logo">RECOMP.EXE</span>
+          <div className="header-logo-block">
+            <span className="header-logo">RECOMP.EXE</span>
+            <span className="header-motto">prove yourself wrong, ellie.</span>
+          </div>
           <button
             className="week-label-btn"
             onClick={() => setShowWeekPicker(v => !v)}

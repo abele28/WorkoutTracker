@@ -118,6 +118,11 @@ button { touch-action: manipulation; }
 }
 .theme-toggle:hover { color: var(--accent); }
 
+.header-logo-block {
+  display:        flex;
+  flex-direction: column;
+  line-height:    1;
+}
 .header-logo {
   font-family:    var(--font-cond);
   font-weight:    800;
@@ -127,14 +132,21 @@ button { touch-action: manipulation; }
   text-shadow:    0 0 12px rgba(0,229,200,.5);
 }
 .header-logo::before { content: "> "; color: var(--text-muted); font-size: 16px; }
-
-/* blinking cursor after logo */
 .header-logo::after {
   content:   "_";
   animation: blink 1.2s step-end infinite;
   color:     var(--accent);
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.header-motto {
+  font-family:    var(--font-mono);
+  font-size:      9px;
+  color:          var(--text-muted);
+  letter-spacing: 0.8px;
+  font-style:     italic;
+  padding-left:   2px;
+  margin-top:     2px;
+}
 
 /* ── Main ─────────────────────────────────────────────────── */
 .app-main {
