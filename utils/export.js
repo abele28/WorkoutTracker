@@ -4,6 +4,7 @@
 
 import { getSessions } from "./storage";
 import { getDailyLogs } from "./nutrition";
+import { getCardioSessions } from "./cardio";
 
 function calcVolume(session) {
   let total = 0;
@@ -15,26 +16,25 @@ function calcVolume(session) {
   return Math.round(total);
 }
 
-// Returns ISO date string for Monday of the week containing `date`
 function weekStart(date) {
   const d = new Date(date);
-  const day = d.getDay(); // 0=Sun
+  const day = d.getDay();
   const diff = (day === 0 ? -6 : 1 - day);
   d.setDate(d.getDate() + diff);
   return d.toISOString().slice(0, 10);
 }
 
-// Get all unique ISO week-start dates across all data
 export function getAvailableWeeks() {
   const sessions = getSessions();
-  const logs = getDailyLogs();
-  const weeks = new Set();
+  const logs     = getDailyLogs();
+  const cardio   = getCardioSessions();
+  const weeks    = new Set();
   sessions.forEach(s => weeks.add(weekStart(s.date)));
   Object.keys(logs).forEach(d => weeks.add(weekStart(d)));
-  return [...weeks].sort((a, b) => b.localeCompare(a)); // newest first
+  cardio.forEach(s => weeks.add(weekStart(s.date)));
+  return [...weeks].sort((a, b) => b.localeCompare(a));
 }
 
-// Build 7 dates from a Monday
 function weekDates(mondayISO) {
   const dates = [];
   const start = new Date(mondayISO + "T12:00:00");
@@ -47,20 +47,28 @@ function weekDates(mondayISO) {
 }
 
 export function exportWeekCSV(mondayISO) {
-  const dates   = weekDates(mondayISO);
-  const sessions = getSessions();
-  const logs    = getDailyLogs();
+  const dates      = weekDates(mondayISO);
+  const sessions   = getSessions();
+  const logs       = getDailyLogs();
+  const cardio     = getCardioSessions();
 
   const headers = [
-    "Date","Weight (lbs)","Calories","Protein (g)","Carbs (g)","Fat (g)",
-    "Water (oz)","Sessions","Total Volume (lbs)","Session Types","Notes"
+    "Date","Weight (lbs)","Calories","Protein (g)","Carbs (g)","Fat (g)","Water (oz)",
+    "Lift Sessions","Total Volume (lbs)","Lift Types",
+    "Cardio Activities","Cardio Duration (min)","Cardio Distance (mi)",
+    "Notes",
   ];
 
   const rows = dates.map(date => {
-    const log  = logs[date] || {};
+    const log         = logs[date] || {};
     const daySessions = sessions.filter(s => s.date.slice(0, 10) === date);
-    const volume = daySessions.reduce((sum, s) => sum + calcVolume(s), 0);
-    const types  = daySessions.map(s => s.workoutType).join(" + ");
+    const dayCardio   = cardio.filter(s => s.date === date);
+    const volume      = daySessions.reduce((sum, s) => sum + calcVolume(s), 0);
+    const liftTypes   = daySessions.map(s => s.workoutType).join(" + ");
+    const cardioTypes = dayCardio.map(s => s.type).join(" + ");
+    const cardioDur   = dayCardio.reduce((sum, s) => sum + (s.duration || 0), 0);
+    const cardioDist  = dayCardio.reduce((sum, s) => sum + (s.distance || 0), 0);
+
     return [
       date,
       log.weight   || "",
@@ -70,9 +78,12 @@ export function exportWeekCSV(mondayISO) {
       log.fat      || "",
       log.water    || "",
       daySessions.length || "",
-      volume || "",
-      types,
-      (log.notes || "").replace(/,/g, ";"),
+      volume       || "",
+      liftTypes,
+      cardioTypes,
+      cardioDur    || "",
+      cardioDist   ? cardioDist.toFixed(1) : "",
+      (log.notes   || "").replace(/,/g, ";"),
     ].join(",");
   });
 
@@ -91,6 +102,7 @@ export function exportAllJSON() {
     exportedAt: new Date().toISOString(),
     sessions:   getSessions(),
     nutrition:  getDailyLogs(),
+    cardio:     getCardioSessions(),
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url  = URL.createObjectURL(blob);

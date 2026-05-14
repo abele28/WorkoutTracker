@@ -1588,3 +1588,220 @@ button { touch-action: manipulation; }
   color:       var(--text-muted);
   text-align:  center;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CARDIO / ACTIVITY LOG
+   ═══════════════════════════════════════════════════════════ */
+
+.cardio-container { padding: 0 0 20px; }
+
+.cardio-fields {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   10px;
+  padding:               0 20px;
+  margin-bottom:         10px;
+}
+
+/* 2-col activity type grid */
+.activity-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   8px;
+  padding:               0 20px 14px;
+}
+
+.activity-btn {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  justify-content: center;
+  gap:            6px;
+  padding:        14px 10px;
+  background:     var(--bg-2);
+  border:         1px solid var(--border);
+  border-radius:  var(--radius);
+  cursor:         pointer;
+  transition:     all 0.15s;
+  position:       relative;
+  overflow:       hidden;
+}
+.activity-btn::before {
+  content:    "";
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     3px;
+  background: var(--act-color, var(--accent));
+  opacity:    0;
+  transition: opacity 0.15s;
+}
+.activity-btn:hover { border-color: var(--act-color, var(--accent)); }
+.activity-btn--active {
+  background:   rgba(0,0,0,.1);
+  border-color: var(--act-color, var(--accent));
+  box-shadow:   0 0 10px color-mix(in srgb, var(--act-color, var(--accent)) 30%, transparent);
+}
+.activity-btn--active::before { opacity: 1; }
+
+.activity-icon {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--act-color, var(--accent));
+}
+.activity-label {
+  font-family:    var(--font-mono);
+  font-size:      10px;
+  font-weight:    700;
+  letter-spacing: 1.5px;
+  color:          var(--text-muted);
+  text-transform: uppercase;
+}
+.activity-btn--active .activity-label { color: var(--act-color, var(--accent)); }
+
+/* Recent cardio history list */
+.cardio-history {
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.cardio-row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         11px 20px;
+  border-bottom:   1px solid var(--border);
+  gap:             10px;
+}
+.cardio-row:hover { background: var(--bg-2); }
+.cardio-row-left  { display: flex; align-items: center; gap: 10px; }
+.cardio-row-right { display: flex; align-items: center; gap: 8px; }
+
+.cardio-type-badge {
+  font-family:    var(--font-mono);
+  font-size:      11px;
+  font-weight:    700;
+  letter-spacing: 0.5px;
+  padding:        3px 9px;
+  border-radius:  4px;
+  white-space:    nowrap;
+}
+.cardio-date {
+  font-family:    var(--font-mono);
+  font-size:      11px;
+  color:          var(--text-muted);
+}
+.cardio-stat {
+  font-family:    var(--font-mono);
+  font-size:      13px;
+  font-weight:    600;
+  color:          var(--text);
+}
+.cardio-delete-btn {
+  background:   none;
+  border:       none;
+  color:        var(--text-muted);
+  font-size:    13px;
+  cursor:       pointer;
+  padding:      2px 4px;
+  border-radius: 4px;
+  line-height:  1;
+  transition:   color 0.15s;
+}
+.cardio-delete-btn:hover { color: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════
+   OVERVIEW TAB
+   ═══════════════════════════════════════════════════════════ */
+
+.overview-container {
+  padding: 20px 20px 20px;
+}
+.overview-container .section-title {
+  margin-bottom: 16px;
+}
+.ov-section {
+  margin-bottom: 14px !important;
+}
+
+/* 2×3 stats grid */
+.ov-stats-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   8px;
+  margin-bottom:         14px;
+}
+.ov-stat-card {
+  background:    var(--bg-2);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       14px 12px;
+  text-align:    center;
+  position:      relative;
+  overflow:      hidden;
+}
+.ov-stat-card::before {
+  content:    "";
+  position:   absolute;
+  top:0; left:0; right:0;
+  height:     2px;
+  background: currentColor;
+  opacity:    0.4;
+}
+.ov-stat-val {
+  font-family:    var(--font-cond);
+  font-weight:    800;
+  font-size:      26px;
+  line-height:    1;
+  margin-bottom:  4px;
+}
+.ov-stat-label {
+  font-family:    var(--font-mono);
+  font-size:      9px;
+  color:          var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* 7-day table */
+.ov-week-table {
+  font-family: var(--font-mono);
+  font-size:   12px;
+}
+.ov-week-head {
+  display:               grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap:                   6px;
+  padding:               6px 0 8px;
+  border-bottom:         1px solid var(--border);
+  font-size:             10px;
+  color:                 var(--text-muted);
+  letter-spacing:        1px;
+  text-transform:        uppercase;
+}
+.ov-week-row {
+  display:               grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap:                   6px;
+  padding:               7px 0;
+  border-bottom:         1px solid var(--border);
+  align-items:           center;
+  color:                 var(--text);
+}
+.ov-week-row:last-child { border-bottom: none; }
+.ov-week-date { color: var(--text-muted); font-size: 11px; }
+
+/* Cardio activity breakdown */
+.ov-cardio-breakdown {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       8px;
+}
+.ov-cardio-item {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+}
+.ov-cardio-count {
+  font-family: var(--font-mono);
+  font-size:   12px;
+  color:       var(--text-muted);
+}

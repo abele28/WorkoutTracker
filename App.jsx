@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import WorkoutLogger  from "./components/WorkoutLogger";
-import WorkoutHistory from "./components/WorkoutHistory";
-import Progress       from "./components/Progress";
-import Nutrition      from "./components/Nutrition";
+import WorkoutLogger from "./components/WorkoutLogger";
+import LiftData      from "./components/LiftData";
+import Nutrition     from "./components/Nutrition";
+import Overview      from "./components/Overview";
 import { PROGRAM } from "./data/workoutTemplates";
 import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek } from "./utils/storage";
 import "./App.css";
 
 const TABS = [
-  { id: "log",       label: "Train",    icon: "⚡" },
-  { id: "nutrition", label: "Nutrition",icon: "◈" },
-  { id: "history",   label: "History",  icon: "≡" },
-  { id: "progress",  label: "Analytics",icon: "△" },
+  { id: "log",       label: "Train",     icon: "⚡" },
+  { id: "liftdata",  label: "Lift Data", icon: "◈" },
+  { id: "nutrition", label: "Nutrition", icon: "❋" },
+  { id: "overview",  label: "Recomp",    icon: "⊛" },
 ];
 
 export default function App() {
@@ -133,9 +133,9 @@ export default function App() {
       {/* ── Main Content ── */}
       <main className="app-main">
         {activeTab === "log"       && <WorkoutLogger currentWeek={currentWeek} onSessionSaved={handleSessionSaved} />}
+        {activeTab === "liftdata"  && <LiftData  theme={theme} />}
         {activeTab === "nutrition" && <Nutrition theme={theme} />}
-        {activeTab === "history"   && <WorkoutHistory refreshKey={refreshKey} />}
-        {activeTab === "progress"  && <Progress theme={theme} />}
+        {activeTab === "overview"  && <Overview  theme={theme} />}
       </main>
 
       {/* ── Bottom Navigation ── */}

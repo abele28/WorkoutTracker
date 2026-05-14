@@ -5,6 +5,10 @@ import {
   getPhoto, savePhoto, deletePhoto, compressImage,
 } from "../utils/nutrition";
 import { getAvailableWeeks, exportWeekCSV, exportAllJSON } from "../utils/export";
+import {
+  ACTIVITY_TYPES, getCardioSessions, saveCardioSession,
+  deleteCardioSession, generateCardioId,
+} from "../utils/cardio";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -338,11 +342,130 @@ function TrendCharts({ theme }) {
   );
 }
 
+// ── Cardio Logger ─────────────────────────────────────────────────────────────
+function CardioView() {
+  const [selectedType, setSelectedType] = useState(null);
+  const [duration,     setDuration]     = useState("");
+  const [distance,     setDistance]     = useState("");
+  const [notes,        setNotes]        = useState("");
+  const [date,         setDate]         = useState(today());
+  const [saved,        setSaved]        = useState(false);
+  const [refresh,      setRefresh]      = useState(0);
+
+  const sessions = getCardioSessions();
+
+  function handleSave() {
+    if (!selectedType || !duration) return;
+    saveCardioSession({
+      id:       generateCardioId(),
+      date,
+      type:     selectedType,
+      duration: parseFloat(duration),
+      distance: distance ? parseFloat(distance) : null,
+      notes:    notes || null,
+    });
+    setSelectedType(null);
+    setDuration("");
+    setDistance("");
+    setNotes("");
+    setSaved(true);
+    setRefresh(r => r + 1);
+    setTimeout(() => setSaved(false), 1800);
+  }
+
+  function handleDelete(id) {
+    if (confirm("Delete this activity?")) {
+      deleteCardioSession(id);
+      setRefresh(r => r + 1);
+    }
+  }
+
+  const activityInfo = ACTIVITY_TYPES.find(a => a.id === selectedType);
+
+  return (
+    <div className="cardio-container">
+      <div className="nutri-date-row">
+        <h2 className="section-title" style={{ margin: 0 }}>&gt;_ ACTIVITY_LOG</h2>
+        <input type="date" className="set-input nutri-date-input" value={date}
+          onChange={e => setDate(e.target.value)} />
+      </div>
+
+      {/* Activity type selector */}
+      <div className="activity-grid">
+        {ACTIVITY_TYPES.map(act => (
+          <button
+            key={act.id}
+            className={`activity-btn ${selectedType === act.id ? "activity-btn--active" : ""}`}
+            style={{ "--act-color": act.color }}
+            onClick={() => setSelectedType(act.id)}
+          >
+            <span className="activity-icon">{act.icon}</span>
+            <span className="activity-label">{act.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Duration + distance */}
+      <div className="cardio-fields">
+        <div className="macro-field">
+          <label className="macro-field-label">DURATION</label>
+          <input className="macro-inp" type="number" inputMode="decimal" placeholder="0"
+            value={duration} onChange={e => setDuration(e.target.value)} />
+          <span className="macro-unit">min</span>
+        </div>
+        <div className="macro-field">
+          <label className="macro-field-label">DISTANCE</label>
+          <input className="macro-inp" type="number" inputMode="decimal" placeholder="—"
+            value={distance} onChange={e => setDistance(e.target.value)} />
+          <span className="macro-unit">mi (opt)</span>
+        </div>
+      </div>
+
+      <textarea className="notes-input nutri-notes" placeholder="// notes — pace, feel, conditions..."
+        value={notes} onChange={e => setNotes(e.target.value)} rows={2} />
+
+      <button
+        className="btn-primary nutri-save-btn"
+        onClick={handleSave}
+        disabled={!selectedType || !duration}
+        style={{ opacity: (!selectedType || !duration) ? 0.4 : 1 }}
+      >
+        {saved ? "LOGGED ✓" : `LOG ${activityInfo ? activityInfo.label : "ACTIVITY"}`}
+      </button>
+
+      {/* Recent activity history */}
+      {sessions.length > 0 && (
+        <div className="cardio-history">
+          <div className="chart-title" style={{ padding: "16px 20px 8px" }}>RECENT_ACTIVITY</div>
+          {sessions.slice(0, 20).map(s => {
+            const act = ACTIVITY_TYPES.find(a => a.id === s.type);
+            return (
+              <div key={s.id + refresh} className="cardio-row">
+                <div className="cardio-row-left">
+                  <span className="cardio-type-badge" style={{ background: act?.color || "var(--accent)", color: "#000" }}>
+                    {act?.icon} {act?.label || s.type}
+                  </span>
+                  <span className="cardio-date">{s.date === today() ? "TODAY" : fmt(s.date)}</span>
+                </div>
+                <div className="cardio-row-right">
+                  <span className="cardio-stat">{s.duration} min</span>
+                  {s.distance && <span className="cardio-stat">{s.distance} mi</span>}
+                  <button className="cardio-delete-btn" onClick={() => handleDelete(s.id)}>✕</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Nutrition component ──────────────────────────────────────────────────
 export default function Nutrition({ theme }) {
   const [activeDate, setActiveDate] = useState(today());
   const [refresh,    setRefresh]    = useState(0);
-  const [view,       setView]       = useState("log"); // log | history | trends | export
+  const [view,       setView]       = useState("log"); // log | history | trends | cardio | export
 
   const logs = getDailyLogsSorted();
 
@@ -358,7 +481,7 @@ export default function Nutrition({ theme }) {
     <div className="nutri-container">
       {/* ── Sub-nav ── */}
       <div className="nutri-subnav">
-        {[["log","LOG"],["history","HISTORY"],["trends","TRENDS"],["export","EXPORT"]].map(([id, label]) => (
+        {[["log","LOG"],["cardio","CARDIO"],["history","HISTORY"],["trends","TRENDS"],["export","EXPORT"]].map(([id, label]) => (
           <button key={id} className={`nutri-subnav-btn ${view === id ? "nutri-subnav-btn--active" : ""}`}
             onClick={() => setView(id)}>
             {label}
@@ -376,6 +499,8 @@ export default function Nutrition({ theme }) {
           <DayForm key={activeDate + refresh} date={activeDate} onSaved={() => setRefresh(r => r+1)} />
         </>
       )}
+
+      {view === "cardio" && <CardioView />}
 
       {view === "history" && (
         <>
