@@ -4,7 +4,7 @@ import LiftData      from "./components/LiftData";
 import Nutrition     from "./components/Nutrition";
 import Overview      from "./components/Overview";
 import { PROGRAM } from "./data/workoutTemplates";
-import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek, seedIfNeeded } from "./utils/storage";
+import { getCurrentWeekIndex, setCurrentWeekIndex, getSessionsForWeek, seedIfNeeded, seedNutritionIfNeeded } from "./utils/storage";
 import "./App.css";
 
 const TABS = [
@@ -28,7 +28,7 @@ export default function App() {
   const currentWeek = PROGRAM[weekIdx];
   const isLastWeek  = weekIdx >= PROGRAM.length - 1;
 
-  useEffect(() => { seedIfNeeded(); }, []);
+  useEffect(() => { seedIfNeeded(); seedNutritionIfNeeded(); }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;

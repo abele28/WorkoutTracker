@@ -7,9 +7,10 @@
 // your browser. It survives page refreshes and browser restarts.
 // ============================================================
 
-const SESSIONS_KEY  = "wt_sessions";
-const METRICS_KEY   = "wt_metrics";
-const SEED_DONE_KEY = "wt_seeded_v1";
+const SESSIONS_KEY       = "wt_sessions";
+const METRICS_KEY        = "wt_metrics";
+const SEED_DONE_KEY      = "wt_seeded_v1";
+const NUTRI_SEED_DONE_KEY = "wt_nutri_seed_v1";
 
 // --- SEED INITIAL SESSIONS ---
 
@@ -120,6 +121,32 @@ export function seedIfNeeded() {
   const toAdd = sessions.filter(s => !existingIds.has(s.id)).reverse();
   localStorage.setItem(SESSIONS_KEY, JSON.stringify([...toAdd, ...existing]));
   localStorage.setItem(SEED_DONE_KEY, "1");
+}
+
+export function seedNutritionIfNeeded() {
+  if (localStorage.getItem(NUTRI_SEED_DONE_KEY)) return;
+
+  const LOG_KEY = "rc_daily_log";
+  const entries = {
+    "2026-05-03": { date:"2026-05-03", calories:1756, protein:131.9, carbs:169.6, fat:50.5, weight:149.4, notes:"" },
+    "2026-05-04": { date:"2026-05-04", calories:1601, protein:124.1, carbs:126.0, fat:57.8, weight:149.4, notes:"" },
+    "2026-05-05": { date:"2026-05-05", calories:1547, protein:131.0, carbs:124.0, fat:49.7, weight:148.8, notes:"" },
+    "2026-05-06": { date:"2026-05-06", calories:1526, protein:138.4, carbs:136.5, fat:40.2, weight:147.8, notes:"" },
+    "2026-05-07": { date:"2026-05-07", calories:1644, protein:132.0, carbs:149.1, fat:49.8, weight:147.8, notes:"" },
+    "2026-05-08": { date:"2026-05-08", calories:1702, protein:118.1, carbs:183.6, fat:44.3, weight:147.8, notes:"" },
+    "2026-05-09": { date:"2026-05-09", calories:1575, protein:140.9, carbs:128.9, fat:47.2, weight:147.8, notes:"" },
+    "2026-05-10": { date:"2026-05-10", calories:1795, protein:135.8, carbs:170.7, fat:52.2, weight:147.8, notes:"" },
+    "2026-05-11": { date:"2026-05-11", calories:1620, protein:126.6, carbs:153.5, fat:47.2, weight:147.8, notes:"" },
+    "2026-05-12": { date:"2026-05-12", calories:1568, protein:128.4, carbs:143.9, fat:47.4, weight:146.8, notes:"" },
+    "2026-05-13": { date:"2026-05-13", weight:147.6, notes:"" },
+  };
+
+  let existing = {};
+  try { existing = JSON.parse(localStorage.getItem(LOG_KEY) || "{}"); } catch {}
+  // Only write dates that aren't already logged
+  const merged = { ...entries, ...existing };
+  localStorage.setItem(LOG_KEY, JSON.stringify(merged));
+  localStorage.setItem(NUTRI_SEED_DONE_KEY, "1");
 }
 
 // --- SESSIONS (workout logs) ---

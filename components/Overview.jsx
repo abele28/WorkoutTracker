@@ -11,6 +11,94 @@ import { getDailyLogsSorted } from "../utils/nutrition";
 import { getCardioSessions, ACTIVITY_TYPES } from "../utils/cardio";
 import { PROGRAM } from "../data/workoutTemplates";
 
+function linReg(points) {
+  const n = points.length;
+  if (n < 2) return null;
+  const sumX  = points.reduce((s, p) => s + p.x, 0);
+  const sumY  = points.reduce((s, p) => s + p.y, 0);
+  const sumXY = points.reduce((s, p) => s + p.x * p.y, 0);
+  const sumX2 = points.reduce((s, p) => s + p.x * p.x, 0);
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  const residuals = points.map(p => p.y - (slope * p.x + intercept));
+  const rmse = Math.sqrt(residuals.reduce((s, r) => s + r * r, 0) / n);
+  return { slope, intercept, rmse };
+}
+
+function WeightPredictor({ logs }) {
+  const weightPoints = logs
+    .filter(l => l.weight && l.date)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((l, i) => ({ x: i, y: parseFloat(l.weight), date: l.date }));
+
+  if (weightPoints.length < 4) return null;
+
+  const reg = linReg(weightPoints);
+  if (!reg) return null;
+
+  const lastIdx  = weightPoints.length - 1;
+  const lastDate = new Date(weightPoints[lastIdx].date + "T12:00:00");
+  const today    = new Date("2026-05-13T12:00:00");
+
+  const calLogs  = logs.filter(l => l.calories);
+  const avgCals  = calLogs.length
+    ? Math.round(calLogs.reduce((s, l) => s + l.calories, 0) / calLogs.length)
+    : null;
+
+  const lbsPerDay  = reg.slope;
+  const lbsPerWeek = lbsPerDay * 7;
+  const direction  = lbsPerDay < -0.01 ? "↓" : lbsPerDay > 0.01 ? "↑" : "→";
+
+  const targets = [3, 7, 14].map(daysAhead => {
+    const futureX    = lastIdx + daysAhead;
+    const predicted  = reg.slope * futureX + reg.intercept;
+    const confidence = reg.rmse * Math.sqrt(1 + 1 / weightPoints.length + daysAhead / weightPoints.length);
+    const d = new Date(lastDate);
+    d.setDate(d.getDate() + daysAhead);
+    const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return { label, predicted: predicted.toFixed(1), ci: confidence.toFixed(1) };
+  });
+
+  return (
+    <div className="progress-section ov-section">
+      <h3 className="chart-title">WEIGHT_PREDICTOR</h3>
+      <div className="terminal-grid" style={{ marginBottom: 14 }}>
+        <div className="terminal-row">
+          <span className="terminal-key">TREND</span>
+          <span className="terminal-val" style={{ color: lbsPerWeek < 0 ? "var(--accent)" : "#e85d26" }}>
+            {direction} {Math.abs(lbsPerWeek).toFixed(2)} lbs/wk
+          </span>
+        </div>
+        {avgCals && (
+          <div className="terminal-row">
+            <span className="terminal-key">AVG INTAKE</span>
+            <span className="terminal-val">{avgCals} kcal/day</span>
+          </div>
+        )}
+        {avgCals && lbsPerDay < 0 && (
+          <div className="terminal-row">
+            <span className="terminal-key">EST. TDEE</span>
+            <span className="terminal-val">{Math.round(avgCals + Math.abs(lbsPerDay) * 3500)} kcal/day</span>
+          </div>
+        )}
+      </div>
+      <div className="ov-week-head" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+        <span>DATE</span><span>PREDICTED</span><span>±RANGE</span>
+      </div>
+      {targets.map(t => (
+        <div key={t.label} className="ov-week-row" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+          <span className="ov-week-date">{t.label}</span>
+          <span style={{ color: "var(--accent)", fontWeight: 600 }}>{t.predicted} lbs</span>
+          <span style={{ color: "var(--text-muted)" }}>±{t.ci}</span>
+        </div>
+      ))}
+      <div style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+        // linear trend on {weightPoints.length} weigh-ins · not a guarantee
+      </div>
+    </div>
+  );
+}
+
 function calcVolume(session) {
   let t = 0;
   session.exercises.forEach(ex => ex.sets.forEach(s => {
@@ -180,6 +268,9 @@ export default function Overview({ theme }) {
           </div>
         </div>
       )}
+
+      {/* ── Weight predictor ── */}
+      <WeightPredictor logs={logs} />
 
       {/* ── Lifting + cardio activity ── */}
       {timelineData.some(d => d.vol > 0 || d.cardiMin > 0) && (
