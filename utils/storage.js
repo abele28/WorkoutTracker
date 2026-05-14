@@ -7,8 +7,120 @@
 // your browser. It survives page refreshes and browser restarts.
 // ============================================================
 
-const SESSIONS_KEY = "wt_sessions";
-const METRICS_KEY  = "wt_metrics";
+const SESSIONS_KEY  = "wt_sessions";
+const METRICS_KEY   = "wt_metrics";
+const SEED_DONE_KEY = "wt_seeded_v1";
+
+// --- SEED INITIAL SESSIONS ---
+
+export function seedIfNeeded() {
+  if (localStorage.getItem(SEED_DONE_KEY)) return;
+
+  function s(count, weight, reps) {
+    return Array.from({ length: count }, () => ({ weight: String(weight), reps: String(reps) }));
+  }
+
+  const sessions = [
+    {
+      id:"seed-w1-ua", date:"2026-05-03T14:00:00.000Z",
+      weekNum:1, weekLabel:"Foundation · Wk 1", workoutType:"Upper A", notes:"",
+      exercises:[
+        {id:"w1_ua_1",name:"30° Incline DB Press",       sets:s(4,25,   12)},
+        {id:"w1_ua_2",name:"Chest Supported Row",         sets:s(4,50,   12)},
+        {id:"w1_ua_3",name:"Seated DB OH Press",          sets:s(3,17.5, 12)},
+        {id:"w1_ua_4",name:"Cable Lat Raises",            sets:s(3,12,   15)},
+        {id:"w1_ua_5",name:"Incline DB Curls",            sets:s(3,12.5, 12)},
+        {id:"w1_ua_6",name:"Cable OH Tricep Extension",   sets:s(3,25,   12)},
+        {id:"w1_ua_7",name:"Plank",                       sets:s(3,0,    30)},
+      ],
+    },
+    {
+      id:"seed-w1-la", date:"2026-05-04T14:00:00.000Z",
+      weekNum:1, weekLabel:"Foundation · Wk 1", workoutType:"Lower A", notes:"",
+      exercises:[
+        {id:"w1_la_1",name:"Back Squat",          sets:s(4,75,  12)},
+        {id:"w1_la_2",name:"Bulgarian Split Squat",sets:s(3,20,  12)},
+        {id:"w1_la_3",name:"Leg Curl (machine)",   sets:s(3,40,  12)},
+        {id:"w1_la_4",name:"Leg Extension",        sets:s(3,60,  12)},
+        {id:"w1_la_5",name:"Standing Calf Raise",  sets:s(3,45,  15)},
+        {id:"w1_la_6",name:"Suitcase Carry",       sets:s(3,0,   20)},
+      ],
+    },
+    {
+      id:"seed-w1-ub", date:"2026-05-06T14:00:00.000Z",
+      weekNum:1, weekLabel:"Foundation · Wk 1", workoutType:"Upper B", notes:"",
+      exercises:[
+        {id:"w1_ub_1",name:"Pull-Up: Dead Hang",        sets:s(3,0,  25)},
+        {id:"w1_ub_2",name:"Lat Pulldown",               sets:s(4,75, 12)},
+        {id:"w1_ub_3",name:"Flat DB Press",              sets:s(3,25, 12)},
+        {id:"w1_ub_4",name:"Seated Cable Row",           sets:s(3,95, 12)},
+        {id:"w1_ub_5",name:"Face Pulls",                 sets:s(3,25, 15)},
+        {id:"w1_ub_6",name:"Hammer Curls",               sets:s(3,15, 12)},
+        {id:"w1_ub_7",name:"Tricep Rope Pushdown",       sets:s(3,35, 12)},
+        {id:"w1_ub_8",name:"Pallof Press",               sets:s(3,0,  10)},
+      ],
+    },
+    {
+      id:"seed-w1-lb", date:"2026-05-08T14:00:00.000Z",
+      weekNum:1, weekLabel:"Foundation · Wk 1", workoutType:"Lower B", notes:"",
+      exercises:[
+        {id:"w1_lb_1",name:"Trap Bar Deadlift",  sets:s(4,125,10)},
+        {id:"w1_lb_2",name:"KB Single-Leg RDL",  sets:s(3,35, 10)},
+        {id:"w1_lb_3",name:"KB Swings",          sets:s(3,35, 15)},
+        {id:"w1_lb_4",name:"Barbell Hip Thrust", sets:s(3,135,12)},
+        {id:"w1_lb_5",name:"Seated Calf Raise",  sets:s(3,45, 15)},
+        {id:"w1_lb_6",name:"Cable Woodchop",     sets:s(3,0,  12)},
+      ],
+    },
+    {
+      id:"seed-w2-ua", date:"2026-05-10T14:00:00.000Z",
+      weekNum:2, weekLabel:"Foundation · Wk 2", workoutType:"Upper A", notes:"",
+      exercises:[
+        {id:"w2_ua_1",name:"30° Incline DB Press",       sets:s(4,25,   12)},
+        {id:"w2_ua_2",name:"Chest Supported Row",         sets:s(4,55,   12)},
+        {id:"w2_ua_3",name:"Seated DB OH Press",          sets:s(3,20,   12)},
+        {id:"w2_ua_4",name:"Cable Lat Raises",            sets:s(3,12,   15)},
+        {id:"w2_ua_5",name:"Incline DB Curls",            sets:s(3,12.5, 12)},
+        {id:"w2_ua_6",name:"Cable OH Tricep Extension",   sets:s(3,27.5, 12)},
+        {id:"w2_ua_7",name:"Plank",                       sets:s(3,0,    40)},
+      ],
+    },
+    {
+      id:"seed-w2-la", date:"2026-05-11T14:00:00.000Z",
+      weekNum:2, weekLabel:"Foundation · Wk 2", workoutType:"Lower A", notes:"",
+      exercises:[
+        {id:"w2_la_1",name:"Back Squat",          sets:s(4,80,   12)},
+        {id:"w2_la_2",name:"Bulgarian Split Squat",sets:s(3,25,   12)},
+        {id:"w2_la_3",name:"Leg Curl (machine)",   sets:s(3,42.5, 12)},
+        {id:"w2_la_4",name:"Leg Extension",        sets:s(3,65,   12)},
+        {id:"w2_la_5",name:"Standing Calf Raise",  sets:s(3,50,   15)},
+        {id:"w2_la_6",name:"Suitcase Carry",       sets:s(3,0,    25)},
+      ],
+    },
+    {
+      id:"seed-w2-ub", date:"2026-05-13T14:00:00.000Z",
+      weekNum:2, weekLabel:"Foundation · Wk 2", workoutType:"Upper B", notes:"",
+      exercises:[
+        {id:"w2_ub_1",name:"Pull-Up: Scapular Pull-Up", sets:s(3,0,    8)},
+        {id:"w2_ub_2",name:"Lat Pulldown",               sets:s(4,80,  12)},
+        {id:"w2_ub_3",name:"Flat DB Press",              sets:s(3,25,  12)},
+        {id:"w2_ub_4",name:"Seated Cable Row",           sets:s(3,100, 12)},
+        {id:"w2_ub_5",name:"Face Pulls",                 sets:s(3,27.5,15)},
+        {id:"w2_ub_6",name:"Hammer Curls",               sets:s(3,15,  12)},
+        {id:"w2_ub_7",name:"Tricep Rope Pushdown",       sets:s(3,37.5,12)},
+        {id:"w2_ub_8",name:"Pallof Press",               sets:s(3,0,   10)},
+      ],
+    },
+  ];
+
+  // Prepend to any existing sessions (newest-first), skip duplicates
+  let existing = [];
+  try { existing = JSON.parse(localStorage.getItem(SESSIONS_KEY) || "[]"); } catch {}
+  const existingIds = new Set(existing.map(s => s.id));
+  const toAdd = sessions.filter(s => !existingIds.has(s.id)).reverse();
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify([...toAdd, ...existing]));
+  localStorage.setItem(SEED_DONE_KEY, "1");
+}
 
 // --- SESSIONS (workout logs) ---
 
