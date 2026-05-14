@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { saveSession, generateId, getSessions } from "../utils/storage";
+import { saveSession, generateId } from "../utils/storage";
 
 const LOWER_EXERCISES = new Set([
   "Back Squat", "Trap Bar Deadlift", "Barbell Hip Thrust", "Bulgarian Split Squat",
@@ -127,6 +127,8 @@ function ExerciseView({ exercise, setIndex, totalSets, totalExercises, allExerci
         </div>
       </div>
 
+      {/* ── Scrollable body ── */}
+      <div className="ex-body">
       {/* ── Set Table ── */}
       <div className="sets-table">
         <div className="sets-table-head">
@@ -197,6 +199,7 @@ function ExerciseView({ exercise, setIndex, totalSets, totalExercises, allExerci
           </button>
         )}
       </div>
+      </div>{/* end .ex-body */}
     </div>
   );
 }
@@ -226,18 +229,6 @@ export default function WorkoutLogger({ currentWeek, onSessionSaved }) {
     template.exercises.forEach(ex => {
       initial[ex.id] = Array.from({ length: ex.sets }, () => ({ weight: "", reps: String(ex.reps) }));
     });
-
-    const prev = getSessions().find(s => s.workoutType === dayName);
-    if (prev) {
-      prev.exercises.forEach(prevEx => {
-        const match = template.exercises.find(e => e.name === prevEx.name);
-        if (!match || !initial[match.id]) return;
-        const lastSet = prevEx.sets.find(s => s.weight);
-        if (lastSet) {
-          initial[match.id] = initial[match.id].map(() => ({ weight: lastSet.weight, reps: String(match.reps) }));
-        }
-      });
-    }
     setSetData(initial);
   }
 

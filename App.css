@@ -78,8 +78,7 @@ button { touch-action: manipulation; }
 .app {
   display:        flex;
   flex-direction: column;
-  min-height:     100vh;
-  min-height:     100dvh;
+  height:         100dvh;
   max-width:      480px;
   margin:         0 auto;
   position:       relative;
@@ -151,6 +150,7 @@ button { touch-action: manipulation; }
 /* ── Main ─────────────────────────────────────────────────── */
 .app-main {
   flex:           1;
+  min-height:     0;
   overflow-y:     auto;
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
 }
@@ -895,8 +895,16 @@ button { touch-action: manipulation; }
 .ex-view {
   display:        flex;
   flex-direction: column;
-  min-height:     calc(100vh - var(--header-h) - var(--nav-h));
-  padding:        0 0 16px;
+  height:         100%;
+}
+
+/* ── Scrollable body below the exercise header ───────────── */
+.ex-body {
+  flex:             1;
+  min-height:       0;
+  overflow-y:       auto;
+  overscroll-behavior-y: contain;
+  padding-bottom:   calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
 }
 
 /* ── Navigation bar ──────────────────────────────────────── */
@@ -1216,13 +1224,10 @@ button { touch-action: manipulation; }
    ═══════════════════════════════════════════════════════════ */
 
 .ex-sticky-header {
-  position:    sticky;
-  top:         var(--header-h);
-  z-index:     6;
-  background:  var(--bg);
-  border-left: 4px solid var(--accent);
+  flex-shrink:   0;
+  background:    var(--bg);
+  border-left:   4px solid var(--accent);
   border-bottom: 1px solid var(--border);
-  /* Remove old ex-nav standalone sticky */
 }
 
 /* Override ex-nav so it's NOT separately sticky anymore */
