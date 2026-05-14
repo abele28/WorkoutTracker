@@ -38,7 +38,6 @@ function WeightPredictor({ logs }) {
 
   const lastIdx  = weightPoints.length - 1;
   const lastDate = new Date(weightPoints[lastIdx].date + "T12:00:00");
-  const today    = new Date("2026-05-13T12:00:00");
 
   const calLogs  = logs.filter(l => l.calories);
   const avgCals  = calLogs.length
@@ -49,13 +48,13 @@ function WeightPredictor({ logs }) {
   const lbsPerWeek = lbsPerDay * 7;
   const direction  = lbsPerDay < -0.01 ? "↓" : lbsPerDay > 0.01 ? "↑" : "→";
 
-  const targets = [3, 7, 14].map(daysAhead => {
+  const targets = [30, 90, 180].map(daysAhead => {
     const futureX    = lastIdx + daysAhead;
     const predicted  = reg.slope * futureX + reg.intercept;
     const confidence = reg.rmse * Math.sqrt(1 + 1 / weightPoints.length + daysAhead / weightPoints.length);
     const d = new Date(lastDate);
     d.setDate(d.getDate() + daysAhead);
-    const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     return { label, predicted: predicted.toFixed(1), ci: confidence.toFixed(1) };
   });
 
